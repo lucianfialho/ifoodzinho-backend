@@ -125,9 +125,12 @@ class UserService {
     try {
       console.log(`🔍 UserService.getUserByUid called with UID: ${uid}`);
       
-      // Demo mode: return mock data for demo users
-      if (uid === 'demo-user-123' || uid === 'Y6XsNOmYW0fkOKXqorKwEzIhN5v1') {
-        console.log(`✅ Returning demo data for UID: ${uid}`);
+      // Demo mode: Only return mock data in development and for specific demo UIDs
+      const isDemoMode = process.env.NODE_ENV !== 'production';
+      const isDemoUID = uid === 'demo-user-123' || uid === 'Y6XsNOmYW0fkOKXqorKwEzIhN5v1';
+      
+      if (isDemoMode && isDemoUID) {
+        console.log(`✅ Returning demo data for UID: ${uid} (Dev Mode)`);
         return {
           id: uid,
           uid,
@@ -169,14 +172,18 @@ class UserService {
           }
         };
       }
-
+      
+      console.log(`🔍 Fetching user from database: ${uid}`);
       const userDoc = await this.usersCollection.doc(uid).get();
       
       if (!userDoc.exists) {
+        console.log(`❌ User not found in database: ${uid}`);
         return null;
       }
       
-      return { id: userDoc.id, ...userDoc.data() };
+      const userData = { id: userDoc.id, ...userDoc.data() };
+      console.log(`✅ User found in database: ${uid}`);
+      return userData;
       
     } catch (error) {
       console.error('❌ Erro ao buscar usuário:', error);
