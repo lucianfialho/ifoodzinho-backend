@@ -389,6 +389,56 @@ class UserService {
       throw error;
     }
   }
+
+  // Alias method for routes compatibility
+  async getUserProfile(uid) {
+    return this.getUserByUid(uid);
+  }
+
+  // Update user profile (alias for updateProfile with full user data return)
+  async updateUserProfile(uid, profileData) {
+    try {
+      await this.updateProfile(uid, profileData);
+      return this.getUserByUid(uid);
+    } catch (error) {
+      console.error('❌ Erro ao atualizar perfil do usuário:', error);
+      throw error;
+    }
+  }
+
+  // Update user preferences (alias for updatePreferences with full user data return)
+  async updateUserPreferences(uid, preferences) {
+    try {
+      await this.updatePreferences(uid, preferences);
+      const user = await this.getUserByUid(uid);
+      return user.preferences;
+    } catch (error) {
+      console.error('❌ Erro ao atualizar preferências do usuário:', error);
+      throw error;
+    }
+  }
+
+  // Get user preferences
+  async getUserPreferences(uid) {
+    try {
+      const user = await this.getUserByUid(uid);
+      return user ? user.preferences : null;
+    } catch (error) {
+      console.error('❌ Erro ao buscar preferências do usuário:', error);
+      throw error;
+    }
+  }
+
+  // Get user stats
+  async getUserStats(uid) {
+    try {
+      const user = await this.getUserByUid(uid);
+      return user ? user.stats : null;
+    } catch (error) {
+      console.error('❌ Erro ao buscar estatísticas do usuário:', error);
+      throw error;
+    }
+  }
 }
 
 module.exports = new UserService();
