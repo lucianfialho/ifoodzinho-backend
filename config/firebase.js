@@ -60,7 +60,15 @@ if (hasRealFirebaseCredentials) {
       settings: () => {},
       collection: (collectionName) => {
         const mockQuery = {
-          get: () => Promise.resolve({ empty: true, docs: [] }),
+          get: () => Promise.resolve({ 
+            empty: true, 
+            docs: [],
+            forEach: function(callback) {
+              // Mock QuerySnapshot.forEach behavior
+              this.docs.forEach(callback);
+            },
+            size: 0
+          }),
           where: () => mockQuery,
           limit: () => mockQuery,
           orderBy: () => mockQuery
@@ -100,7 +108,15 @@ if (hasRealFirebaseCredentials) {
           where: () => mockQuery,
           limit: () => mockQuery,
           orderBy: () => mockQuery,
-          get: () => Promise.resolve({ empty: true, docs: [] })
+          get: () => Promise.resolve({ 
+            empty: true, 
+            docs: [],
+            forEach: function(callback) {
+              // Mock QuerySnapshot.forEach behavior
+              this.docs.forEach(callback);
+            },
+            size: 0
+          })
         };
       }
     }),
