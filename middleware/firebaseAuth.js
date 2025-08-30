@@ -41,6 +41,7 @@ const authenticateUser = async (req, res, next) => {
     console.log('✅ Token válido! Usuário:', decodedToken.uid);
     
     next();
+    console.log('🚀 next() chamado no authenticateUser - indo para rota');
   } catch (error) {
     console.error('❌ Erro de autenticação:', error.message);
     

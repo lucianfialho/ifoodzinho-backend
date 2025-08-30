@@ -38,6 +38,13 @@ jspm_packages/
 .env.test.local
 .env.production.local
 
+# Firebase credentials (NEVER COMMIT THESE)
+*firebase-adminsdk*.json
+*serviceAccount*.json
+firebase-key*.json
+firebase-credentials*.json
+*.pem
+
 # macOS
 .DS_Store
 

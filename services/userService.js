@@ -22,6 +22,9 @@ class UserService {
           photoURL: userData.photoURL || userData.picture,
           emailVerified: userData.emailVerified || false,
           
+          // Código único do usuário para facilitar convites
+          userCode: this.generateUserCode(),
+          
           // Profile completo
           profile: {
             firstName: userData.firstName || '',
@@ -120,6 +123,53 @@ class UserService {
   // Buscar usuário por UID
   async getUserByUid(uid) {
     try {
+      console.log(`🔍 UserService.getUserByUid called with UID: ${uid}`);
+      
+      // Demo mode: return mock data for demo users
+      if (uid === 'demo-user-123' || uid === 'Y6XsNOmYW0fkOKXqorKwEzIhN5v1') {
+        console.log(`✅ Returning demo data for UID: ${uid}`);
+        return {
+          id: uid,
+          uid,
+          email: 'demo@test.com',
+          displayName: 'Ana Silva',
+          photoURL: 'demo:ana@foodieswipe.com:ANA001',
+          emailVerified: false,
+          userCode: 'FKFGXR',
+          profile: {
+            firstName: 'Ana',
+            lastName: 'Silva',
+            bio: '',
+            birthday: null,
+            location: {
+              lat: null,
+              lng: null,
+              address: '',
+              city: '',
+              state: ''
+            }
+          },
+          preferences: {
+            cuisines: [],
+            dietary: [],
+            priceRange: { min: 1, max: 4 },
+            maxDeliveryTime: 60,
+            maxDeliveryFee: 15,
+            excludeIngredients: []
+          },
+          stats: {
+            totalSwipes: 0,
+            totalMatches: 0,
+            totalOrders: 0,
+            currentStreak: 0,
+            longestStreak: 0,
+            achievements: [],
+            level: 1,
+            experience: 0
+          }
+        };
+      }
+
       const userDoc = await this.usersCollection.doc(uid).get();
       
       if (!userDoc.exists) {
@@ -130,6 +180,7 @@ class UserService {
       
     } catch (error) {
       console.error('❌ Erro ao buscar usuário:', error);
+      console.error('❌ Stack trace:', error.stack);
       throw error;
     }
   }
@@ -237,6 +288,77 @@ class UserService {
       
     } catch (error) {
       console.error('❌ Erro ao verificar match:', error);
+    }
+  }
+
+  // Registrar match (decisão final de casal)
+  async recordMatch(uid, matchData) {
+    try {
+      const userRef = this.usersCollection.doc(uid);
+      const timestamp = new Date();
+      
+      const matchRecord = {
+        dishId: matchData.dishId,
+        restaurantId: matchData.restaurantId,
+        matchType: matchData.matchType || 'couple',
+        partnerUserId: matchData.partnerUserId,
+        sessionCode: matchData.sessionCode,
+        isFinalDecision: matchData.isFinalDecision || false,
+        matchedAt: timestamp
+      };
+      
+      await userRef.update({
+        matches: admin.firestore.FieldValue.arrayUnion(matchRecord),
+        'stats.totalMatches': admin.firestore.FieldValue.increment(1),
+        updatedAt: timestamp,
+        lastActiveAt: timestamp
+      });
+      
+      console.log(`🎯 Match registrado para usuário: ${uid} (tipo: ${matchData.matchType})`);
+      return true;
+      
+    } catch (error) {
+      console.error('❌ Erro ao registrar match:', error);
+      throw error;
+    }
+  }
+
+  // Gerar código único do usuário (6 caracteres)
+  generateUserCode() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    for (let i = 0; i < 6; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  }
+
+  // Buscar usuário pelo código
+  async getUserByCode(userCode) {
+    try {
+      const snapshot = await this.usersCollection
+        .where('userCode', '==', userCode.toUpperCase())
+        .limit(1)
+        .get();
+      
+      if (snapshot.empty) {
+        return null;
+      }
+      
+      const userDoc = snapshot.docs[0];
+      const userData = userDoc.data();
+      
+      // Retornar dados básicos (não sensíveis)
+      return {
+        uid: userData.uid,
+        displayName: userData.displayName,
+        photoURL: userData.photoURL,
+        userCode: userData.userCode
+      };
+      
+    } catch (error) {
+      console.error('❌ Erro ao buscar usuário por código:', error);
+      throw error;
     }
   }
 

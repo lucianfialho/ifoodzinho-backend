@@ -1,0 +1,30 @@
+{
+  "l1": {
+    "hits": 0,
+    "misses": 0,
+    "sets": 0,
+    "deletes": 0
+  },
+  "l2": {
+    "hits": 0,
+    "misses": 0,
+    "sets": 0,
+    "deletes": 0
+  },
+  "warming": {
+    "triggered": 0,
+    "completed": 0,
+    "errors": 0
+  },
+  "responseTime": {
+    "avg": 0,
+    "min": 9007199254740991,
+    "max": 0,
+    "total": 0,
+    "count": 0
+  },
+  "totalRequests": 0,
+  "cacheHitRate": 0,
+  "storageSize": 0,
+  "lastCleanup": 1756482885166
+}

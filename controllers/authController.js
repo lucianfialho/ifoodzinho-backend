@@ -42,10 +42,13 @@ class AuthController {
 
   // Buscar dados do perfil
   async getProfile(req, res) {
+    console.log(`🚀 DEBUG: getProfile method called!`);
     try {
       const { uid } = req.user;
+      console.log(`🔍 AuthController.getProfile called for UID: ${uid}`);
       
       const userData = await userService.getUserByUid(uid);
+      console.log(`📋 UserData returned:`, userData ? 'Found' : 'Not found');
       
       if (!userData) {
         return res.status(404).json({
@@ -61,6 +64,7 @@ class AuthController {
         displayName: userData.displayName,
         photoURL: userData.photoURL,
         emailVerified: userData.emailVerified,
+        userCode: userData.userCode, // ✅ Todos os usuários têm userCode no Firebase
         profile: userData.profile,
         preferences: userData.preferences,
         stats: userData.stats,
